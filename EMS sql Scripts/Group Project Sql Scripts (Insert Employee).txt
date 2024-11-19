@@ -1,0 +1,27 @@
+w 
+
+////////////////// Used to insert a new employee into the employee's table using a first name,
+////////////////// then the generated empis is placed into each of the necessary lists. 
+
+insert into employees (Fname)
+values 
+('Leo');
+
+set @last_empid = last_insert_id();
+
+insert into employee_job_titles (empid)
+values
+(@last_empid);
+
+insert into payroll  (empid)
+values
+(@last_empid);
+
+insert into personal_information  (empid)
+values
+(@last_empid);
+
+insert into employee_division  (empid)
+values
+(@last_empid);
+

@@ -1,0 +1,71 @@
+//w
+
+
+//////////////////////////// Empid, name, and job title of those who are Software engineers
+
+
+use employeedata;
+
+
+
+select e.empid, e.Fname, e.Lname, jt.job_title 
+from employees e 
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+where ejt.job_title_id = 102; 
+
+
+/////////////////////////// Empid, name,job title, payroll of those who are Software engineers 
+/////////////////////////// for the date of 2023-12-21
+
+select e.empid, e.Fname, e.Lname, jt.job_title, p.*
+from employees e 
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+join payroll p on e.empid = p.empid 
+where ejt.job_title_id = 102 and p.pay_date = '2023-12-31';
+
+
+//////////////////////////// Same as above, but for the date 2023-11-30
+
+select e.empid, e.Fname, e.Lname, jt.job_title, p.*
+from employees e 
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+join payroll p on e.empid = p.empid 
+where ejt.job_title_id = 102 and p.pay_date = '2023-11-30';
+
+
+
+////////////////////////////// Same as above. however, a new 
+////////////////////////////// column named "pay_date_str" (String, not Date) is used.
+
+select e.empid, e.Fname, e.Lname, jt.job_title, p.*
+from employees e 
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+join payroll p on e.empid = p.empid 
+where ejt.job_title_id = 102 and p.pay_date_str = '2023-11-30'; 
+
+
+//////////////////////////// empid, name, division, payroll for the Hq Division
+
+select e.empid, e.Fname, e.Lname, d.ID, d.Name, p.* 
+from employees e 
+JOIN employee_division ed on e.empid = ed.empid 
+join division d on ed.div_ID = d.ID
+join payroll p on e.empid = p.empid
+where d.ID  = 999 and p.pay_date_str = '2023-11-30';
+
+
+
+Variables to keep track of:
+
+Earnings Fed_Tax Fed_Med Fed_SS State_Tax Retirement Health_Care
+
+
+
+
+
+
+

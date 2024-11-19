@@ -1,0 +1,303 @@
+//w
+
+
+///////////////////////// This prints the all of the data in the employee table as well as the employee's job title
+
+use employeedata;
+
+SELECT e.*, jt.job_title
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id; 
+
+
+//////////////////////// Same as above, adds the payroll information
+
+SELECT e.*, jt.job_title, p.pay_date, p.earnings, p.fed_tax, p.fed_med, p.fed_SS, p.state_tax, p.retire_401k, p.health_care
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+JOIN payroll p ON e.empid = p.empid;
+
+/////////////////////// Version 1, returns same information as the first script, but only for an chosen ID.
+use employeedata;
+
+SELECT e.*, jt.job_title
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+WHERE e.empid = 15;
+
+
+ 
+
+//////////////////////// Version 2 of the Payroll code. This version prints only the most recent date, preventing duplicate rovvs
+
+SELECT e.*, jt.job_title, p.pay_date, p.earnings, p.fed_tax, p.fed_med, p.fed_SS, p.state_tax, p.retire_401k, p.health_care
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+JOIN (
+    SELECT empid, MAX(pay_date) AS max_pay_date
+    FROM payroll
+    GROUP BY empid
+) latest_payroll ON e.empid = latest_payroll.empid
+JOIN payroll p ON latest_payroll.empid = p.empid AND latest_payroll.max_pay_date = p.pay_date;
+
+
+
+/////////////////////// Same as above, adds the Division information for a user.
+
+SELECT e.*, jt.job_title, p.pay_date, p.earnings, p.fed_tax, p.fed_med, p.fed_SS, p.state_tax, p.retire_401k, p.health_care,
+d.*
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+JOIN payroll p ON e.empid = p.empid
+join employee_division ed on e.empid = ed.empid
+join division d on ed.div_ID = d.ID;
+
+
+
+////////////////////////// Version 2. adds Division information for a user 
+////////////////////////// Note *This only produces 5 hits, since only 
+////////////////////////// 5 employees have and ID in the emp Division table.
+
+SELECT e.*, jt.job_title, p.pay_date, p.earnings, p.fed_tax, p.fed_med, p.fed_SS, p.state_tax, p.retire_401k, p.health_care,
+d.Name, d.addressLine1, d.addressLine2, d.country, d.postalCode 
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+JOIN (
+    SELECT empid, MAX(pay_date) AS max_pay_date
+    FROM payroll
+    GROUP BY empid
+) latest_payroll ON e.empid = latest_payroll.empid
+JOIN payroll p ON latest_payroll.empid = p.empid AND latest_payroll.max_pay_date = p.pay_date
+join employee_division ed on e.empid = ed.empid
+join division d on ed.div_ID = d.ID;
+
+
+
+/////////////////////// sql command from from ShowEmployees 2
+
+SELECT e.Fname, e.Lname, e.email, jt.job_title, p.pay_date, p.earnings, p.fed_tax, p.fed_med, 
+p.fed_SS, p.state_tax, p.retire_401k, p.health_care
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+JOIN payroll p ON e.empid = p.empid
+ORDER BY p.pay_date ;
+
+
+//////////////////////////// This command returns: All "employees" table data, 
+//////////////////////////// Division table: Name, address lines 1 and 2, country, postal code 
+//////////////////////////// City Table: City Name, State Table: State Name
+
+use employeedata;
+
+SELECT e.*, jt.job_title, d.Name, d.addressLine1, d.addressLine2, d.country ,d.postalCode, s.State_Name, c.City_Name  
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+join employee_division ed on e.empid = ed.empid
+join division d on ed.div_ID = d.ID
+join state s on d.State_ID = s.State_ID 
+join city c on d.City_ID = c.City_ID  
+order by e.empid; 
+
+///////////////////////////// Same as above, however the first and last name is the filter.
+
+use employeedata;
+
+
+SELECT e.*, jt.job_title, d.Name, d.addressLine1, d.addressLine2, d.country ,d.postalCode, s.State_Name, c.City_Name  
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+join employee_division ed on e.empid = ed.empid
+join division d on ed.div_ID = d.ID
+join state s on d.State_ID = s.State_ID 
+join city c on d.City_ID = c.City_ID  
+where e.Fname = 'bugs' AND e.Lname  = 'bunny';
+
+
+
+////////////////////////////// Same as above, however the SSN is the filter.
+
+SELECT e.*, jt.job_title, d.Name, d.addressLine1, d.addressLine2, d.country ,d.postalCode, s.State_Name, c.City_Name  
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+join employee_division ed on e.empid = ed.empid
+join division d on ed.div_ID = d.ID
+join state s on d.State_ID = s.State_ID 
+join city c on d.City_ID = c.City_ID  
+where e.SSN = '123456789'
+
+
+/////////////////////////////// This Query is used to update salaries within a givin range.
+
+use employeedata;
+
+
+UPDATE employees
+SET Salary = 
+  CASE
+    WHEN Salary >= 150000 AND Salary < 250000 THEN Salary * 1.032
+    ELSE Salary
+  END
+WHERE Salary >= 150000 AND Salary < 250000;
+
+
+///////////////////////////////// Simplified version of Above
+
+UPDATE employees
+SET Salary = Salary * 1.032
+WHERE Salary >= 150000 and Salary < 250000;
+
+
+
+
+////////////////////////////////// Another version of above
+
+UPDATE employees
+SET Salary = Salary * 1.032
+WHERE Salary >= 150000 and Salary < 250000;
+
+select e.*
+from employees e ;
+
+
+
+///////////////////////////// Fills the employee_division table
+
+INSERT INTO employee_division (empid, div_ID)
+values
+(1,999),
+  (2,999),
+  (3,999),
+  (4,-1),
+  (5,-1),
+  (6,-1),
+  (7,1),
+  (8,-1),
+  (9,-1),
+  (10,1),
+  (11, -1),
+  (12, -1),
+  (13, -1),
+  (14, -1),
+  (15, -1);
+
+
+
+//////////////////////////// Empid, name, and job title of those who are Software engineers
+
+
+use employeedata;
+
+
+
+select e.empid, e.Fname, e.Lname, jt.job_title 
+from employees e 
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+where ejt.job_title_id = 102; 
+
+
+/////////////////////////// Empid, name, and job title of those who are Software engineers 
+/////////////////////////// for the date of 2023-12-21
+
+select e.empid, e.Fname, e.Lname, jt.job_title, p.*
+from employees e 
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+join payroll p on e.empid = p.empid 
+where ejt.job_title_id = 102 and p.pay_date = '2023-12-31';
+
+
+//////////////////////////// Same as above, but for the date 2023-11-30
+
+select e.empid, e.Fname, e.Lname, jt.job_title, p.*
+from employees e 
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+join payroll p on e.empid = p.empid 
+where ejt.job_title_id = 102 and p.pay_date = '2023-11-30'; 
+
+
+//////////////////////////// Last Used Query
+
+use employeedata;
+
+SELECT e.*, jt.job_title, p.pay_date, p.earnings, p.fed_tax, p.fed_med, p.fed_SS, p.state_tax, p.retire_401k, p.health_care,
+d.Name, d.addressLine1, d.addressLine2, d.country, d.postalCode 
+FROM employees e
+JOIN employee_job_titles ejt ON e.empid = ejt.empid
+JOIN job_titles jt ON ejt.job_title_id = jt.job_title_id
+JOIN (
+    SELECT empid, MAX(pay_date) AS max_pay_date
+    FROM payroll
+    GROUP BY empid
+) latest_payroll ON e.empid = latest_payroll.empid
+JOIN payroll p ON latest_payroll.empid = p.empid AND latest_payroll.max_pay_date = p.pay_date
+join employee_division ed on e.empid = ed.empid
+join division d on ed.div_ID = d.ID;
+
+
+
+
+//////////////////////////////////// old insert into Division code.
+
+INSERT INTO division (ID, Name, addressLine1, addressLine2, country, postalCode, State_ID, City_ID) 
+VALUES(1,'Technology Engineering', '200 17th Street NW', '', 'USA', '30363', 1, 1),
+		(2,'Marketing', '200 17th Street NW', '', 'USA', '30363', 1, 1),
+		(3,'Human Resources', '45 West 57th Street', '', 'USA', '00034', 2, 2),
+		(4,'','', '', '', '', 'USA', '00034', -1, -1),
+		(999,'HQ', '45 West 57th Street', '', 'USA', '00034', 2, 2)
+		(4,'','', '', '', '', 'USA', '00034', -1, -1),
+		(4,'','', '', '', '', 'USA', '00034', -1, -1),;
+
+
+
+
+use employeedata;
+
+INSERT INTO division (ID, Name, addressLine1, addressLine2, country, postalCode, State_ID, City_ID) 
+VALUES(1,'Technology Engineering', '200 17th Street NW', '', 'USA', '30363', 1, 1),
+		(2,'Marketing', '200 17th Street NW', '', 'USA', '30363', 1, 1),
+		(3,'Human Resources', '45 West 57th Street', '', 'USA', '00034', 2, 2),
+		(999,'HQ', '45 West 57th Street', '', 'USA', '00034', 2, 2);
+
+
+
+
+
+
+
+
+
+
+//////////////////////JUnk
+
+String sqlQuery2 = "UPDATE employees " +
+                   "SET Salary = " +
+                   "CASE " +
+                   "WHEN Salary >= " + salaryLowBound + " AND Salary < " + salaryHighBound + " THEN Salary * " + salaryIncPecentage + "" + 
+                   "ELSE Salary " +
+                   "END " +
+                   "WHERE Salary >= " + salaryLowBound + " AND Salary < " + salaryHighBound;
+
+902
+900
+901
+102
+101
+201
+100
+102
+200
+201
+202
+103

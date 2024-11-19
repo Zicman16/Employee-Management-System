@@ -1,0 +1,36 @@
+// W w
+
+////////////////////////////// used to update data in the Employees table
+
+update employees 
+set Fname = 'Test'
+where empid = 16;
+
+
+
+//////////////////////////////// used to update a job title ID
+
+update employee_job_titles 
+set job_title_id = 101
+where empid = 16;
+
+
+
+/////////////////////////////////// Used to update payroll value 
+
+update payroll  
+set earnings = 540.00
+where empid = 15 and pay_date = '2023-12-31';
+
+
+
+///////////////////////////////////// Used to update Gender in personal info
+
+update personal_information  
+set Gender = 'M'
+where empid = 15;
+
+
+
+//////////////////////////////////////
+
